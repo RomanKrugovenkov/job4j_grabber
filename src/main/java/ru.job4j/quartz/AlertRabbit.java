@@ -3,10 +3,7 @@ package ru.job4j.quartz;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 
-import java.io.FileInputStream;
 import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.util.Properties;
 
 import static org.quartz.JobBuilder.*;
@@ -14,6 +11,7 @@ import static org.quartz.TriggerBuilder.*;
 import static org.quartz.SimpleScheduleBuilder.*;
 
 public class AlertRabbit {
+
     public static void main(String[] args) {
         try {
             Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
