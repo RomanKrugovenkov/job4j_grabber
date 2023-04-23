@@ -4,6 +4,8 @@ import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import static org.quartz.JobBuilder.*;
@@ -14,39 +16,41 @@ public class AlertRabbit {
 
     public static void main(String[] args) {
         try {
+            List<Long> store = new ArrayList<>();
             Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
             scheduler.start();
-            JobDetail job = newJob(Rabbit.class).build();
+            JobDataMap data = new JobDataMap();
+            data.put("store", store);
+            JobDetail job = newJob(Rabbit.class)
+                    .usingJobData(data)
+                    .build();
             SimpleScheduleBuilder times = simpleSchedule()
-                    .withIntervalInSeconds(getIntProperty("rabbit.interval"))
+                    .withIntervalInSeconds(5)
                     .repeatForever();
             Trigger trigger = newTrigger()
                     .startNow()
                     .withSchedule(times)
                     .build();
             scheduler.scheduleJob(job, trigger);
-        } catch (SchedulerException se) {
+            Thread.sleep(5000);
+            scheduler.shutdown();
+            System.out.println(store);
+        } catch (Exception se) {
             se.printStackTrace();
         }
     }
 
-    private static Integer getIntProperty(String key) {
-        int rsl;
-        try (InputStream in = AlertRabbit.class.getClassLoader().
-                getResourceAsStream("rabbit.properties")) {
-            Properties config = new Properties();
-            config.load(in);
-            rsl = Integer.parseInt(config.getProperty(key));
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-        return rsl;
-    }
-
     public static class Rabbit implements Job {
+
+        public Rabbit() {
+            System.out.println("хэшкод = " + hashCode());
+        }
+
         @Override
         public void execute(JobExecutionContext context) {
             System.out.println("Rabbit runs here ...");
+            List<Long> store = (List<Long>) context.getJobDetail().getJobDataMap().get("store");
+            store.add(System.currentTimeMillis());
         }
     }
 }
