@@ -1,5 +1,11 @@
 package ru.job4j.utils;
 
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -9,6 +15,20 @@ public class Post {
     String link;
     String description;
     LocalDateTime created;
+
+    public static void main(String[] args) throws IOException {
+        String url = "https://career.habr.com/vacancies/1000119703";
+        Post post = new Post();
+        post.retrieveDescription(url);
+        System.out.printf("Описание вакансии:%n%s", post.description);
+    }
+
+    void retrieveDescription(String link) throws IOException {
+        Connection connection = Jsoup.connect(link);
+        Document document = connection.get();
+        Element elementDesc = document.selectFirst(".vacancy-description__text");
+        description = elementDesc.text();
+    }
 
     public int getId() {
         return id;
