@@ -1,33 +1,24 @@
 package ru.job4j.utils;
 
-import org.jsoup.Connection;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Post {
-    int id;
+    int id = 0;
     String title;
     String link;
     String description;
     LocalDateTime created;
 
-    public static void main(String[] args) throws IOException {
-        String url = "https://career.habr.com/vacancies/1000119703";
-        Post post = new Post();
-        post.retrieveDescription(url);
-        System.out.printf("Описание вакансии:%n%s", post.description);
+    public Post() {
     }
 
-    void retrieveDescription(String link) throws IOException {
-        Connection connection = Jsoup.connect(link);
-        Document document = connection.get();
-        Element elementDesc = document.selectFirst(".vacancy-description__text");
-        description = elementDesc.text();
+    public Post(String title, String link, String description, LocalDateTime created) {
+        this.id = id++;
+        this.title = title;
+        this.link = link;
+        this.description = description;
+        this.created = created;
     }
 
     public int getId() {
@@ -85,5 +76,16 @@ public class Post {
     @Override
     public int hashCode() {
         return Objects.hash(id, link);
+    }
+
+    @Override
+    public String toString() {
+        return "Post{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", link='" + link + '\'' +
+                ", description='" + description + '\'' +
+                ", created=" + created +
+                '}';
     }
 }
