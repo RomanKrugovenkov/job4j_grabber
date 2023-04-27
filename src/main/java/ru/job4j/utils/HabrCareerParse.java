@@ -26,7 +26,7 @@ public class HabrCareerParse implements Parse {
         System.out.println(hcp.list(PAGE_LINK));
     }
 
-    String retrieveDescription(String link) {
+    private String retrieveDescription(String link) {
         Connection connection = Jsoup.connect(link);
         Document document;
         try {
