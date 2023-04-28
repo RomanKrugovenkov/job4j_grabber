@@ -5,5 +5,5 @@ CREATE TABLE IF NOT EXISTS post
     text    text,
     link    text,
     created timestamp,
-    CONSTRAINT post_unique UNIQUE (name)
+    CONSTRAINT post_unique UNIQUE (link)
 );
