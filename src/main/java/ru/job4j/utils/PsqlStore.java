@@ -1,8 +1,6 @@
 package ru.job4j.utils;
 
-import ru.job4j.quartz.AlertRabbitSQL;
-
-import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -14,24 +12,32 @@ public class PsqlStore implements Store {
 
     private Connection cnn;
 
-    public PsqlStore() {
-        try (InputStream in = AlertRabbitSQL.class.getClassLoader().
-                getResourceAsStream("grabber.properties")) {
-            Properties pr = new Properties();
-            pr.load(in);
-            Class.forName(pr.getProperty("driver-class-name"));
+    public PsqlStore(Properties cfg) {
+        try {
+            Class.forName(cfg.getProperty("driver-class-name"));
             cnn = DriverManager.getConnection(
-                    pr.getProperty("url"),
-                    pr.getProperty("username"),
-                    pr.getProperty("password")
+                    cfg.getProperty("url"),
+                    cfg.getProperty("username"),
+                    cfg.getProperty("password")
             );
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 
+    private static Properties cfg() {
+        var cfg = new Properties();
+        try (InputStream in = Grabber.class.getClassLoader()
+                .getResourceAsStream("grabber.properties")) {
+            cfg.load(in);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return cfg;
+    }
+
     public static void main(String[] args) throws SQLException {
-        PsqlStore psqlStore = new PsqlStore();
+        PsqlStore psqlStore = new PsqlStore(cfg());
         psqlStore.save(new Post(
                 "Вакансия1",
                 "https://career.habr.com/1",
